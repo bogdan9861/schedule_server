@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  login    String @unique
+  password String
+  role     Role
+
+  group   Group? @relation(fields: [groupId], references: [id])
+  groupId Int?
+
+  @@map("users")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+model Group {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  Schedule Schedule[]
+  User     User[]
+}
+
+model Schedule {
+  id   Int      @id @default(autoincrement())
+  file String
+  date DateTime
+
+  group   Group @relation(fields: [groupId], references: [id])
+  groupId Int
+}
+
+model Event {
+  id    Int      @id @default(autoincrement())
+  title String
+  text  String
+  date  DateTime @default(now())
+  file  String
+}
