@@ -13,6 +13,8 @@ const create = async (req, res) => {
       data: {
         groupId: +groupId,
         file: file.path,
+        fileName: file.originalname,
+        fileExtension: file.mimetype,
         date: date,
       },
       include: {

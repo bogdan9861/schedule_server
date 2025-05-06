@@ -37,9 +37,11 @@ model Group {
 }
 
 model Schedule {
-  id   Int      @id @default(autoincrement())
-  file String
-  date DateTime
+  id            Int      @id @default(autoincrement())
+  file          String
+  fileName      String?
+  fileExtension String?
+  date          DateTime
 
   group   Group @relation(fields: [groupId], references: [id])
   groupId Int
