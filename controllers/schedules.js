@@ -45,6 +45,14 @@ const getMyChedule = async (req, res) => {
       where: {
         groupId: req.user.groupId,
       },
+      include: {
+        group: {
+          include: {
+            Schedule: false,
+            User: false,
+          },
+        },
+      },
     });
 
     res.status(200).json(schedules);
