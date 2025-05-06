@@ -35,6 +35,12 @@ const create = async (req, res) => {
 
 const getMyChedule = async (req, res) => {
   try {
+    if (!req.user.groupId) {
+      return res
+        .status(400)
+        .json({ message: "Failed to get group on this account" });
+    }
+
     const schedules = await prisma.schedule.findMany({
       where: {
         groupId: req.user.groupId,
