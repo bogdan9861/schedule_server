@@ -81,6 +81,29 @@ const getMyChedule = async (req, res) => {
 
     res.status(200).json(schedules);
   } catch (error) {
+    res.status(500).json({ message: "Unknown server error" });
+  }
+};
+
+const getAll = async (req, res) => {
+  try {
+    const { groupId } = req.query;
+
+    let where = {};
+
+    if (groupId) {
+      where.groupId = +groupId;
+    }
+
+    const schedules = await prisma.schedule.findMany({
+      orderBy: {
+        date: "desc",
+      },
+      where,
+    });
+
+    res.status(200).json(schedules);
+  } catch (error) {
     console.log(error);
 
     res.status(500).json({ message: "Unknown server error" });
@@ -90,4 +113,5 @@ const getMyChedule = async (req, res) => {
 module.exports = {
   create,
   getMyChedule,
+  getAll,
 };

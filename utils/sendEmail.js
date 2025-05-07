@@ -7,6 +7,7 @@ const sendEmail = (to, title, message) => {
   const transport = nodemailer.createTransport(
     directTransport({
       name: fromHost,
+      debug: true,
     })
   );
   transport.sendMail(
