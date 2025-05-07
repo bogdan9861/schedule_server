@@ -23,6 +23,12 @@ const register = async (req, res) => {
       });
     }
 
+    const group = await prisma.group.findFirst({
+      where: {
+        id: groupId,
+      },
+    });
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -33,6 +39,7 @@ const register = async (req, res) => {
         password: hashedPassword,
         role: "STUDENT",
         groupId: +groupId,
+        course: group.course,
       },
       omit: {
         groupId: true,
@@ -123,8 +130,45 @@ const current = async (req, res) => {
   }
 };
 
+const edit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, login, course, role, groupId } = req.body;
+
+    const data = {};
+
+    Array.from(Object.keys(req.body)).forEach((el) => {
+      if (!req.body[el]) return;
+
+      data[el] = req.body[el];
+    });
+
+    const user = await prisma.user.update({
+      where: {
+        id: +id,
+      },
+      data,
+      include: {
+        group: {
+          include: {
+            Schedule: false,
+            User: false,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({ message: "Unknown server error" });
+  }
+};
+
 module.exports = {
   register,
   login,
   current,
+  edit,
 };

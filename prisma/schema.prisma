@@ -15,6 +15,7 @@ model User {
   name     String
   login    String @unique
   password String
+  course   Int    @default(1)
   role     Role
 
   group   Group? @relation(fields: [groupId], references: [id])
@@ -29,8 +30,9 @@ enum Role {
 }
 
 model Group {
-  id   Int    @id @default(autoincrement())
-  name String
+  id     Int    @id @default(autoincrement())
+  name   String
+  course Int?
 
   Schedule Schedule[]
   User     User[]
