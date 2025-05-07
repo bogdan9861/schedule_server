@@ -1,21 +1,18 @@
 const { prisma } = require("../prisma/prisma.client");
+const { sendEmail } = require("../utils/sendEmail");
 
 const create = async (req, res) => {
   try {
-    const { groupId, date } = req.body;
+    const { groupId } = req.body;
     const file = req.file;
 
-    if (!file || !file?.path || !date) {
+    if (!file || !file?.path || !groupId) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const schedule = await prisma.schedule.create({
-      data: {
+    const users = await prisma.user.findMany({
+      where: {
         groupId: +groupId,
-        file: file.path,
-        fileName: file.originalname,
-        fileExtension: file.mimetype,
-        date: date,
       },
       include: {
         group: {
@@ -25,6 +22,31 @@ const create = async (req, res) => {
           },
         },
       },
+    });
+
+    const schedule = await prisma.schedule.create({
+      data: {
+        groupId: +groupId,
+        file: file.path,
+        fileName: file.originalname,
+        fileExtension: file.mimetype,
+      },
+      include: {
+        group: {
+          include: {
+            Schedule: false,
+            User: false,
+          },
+        },
+      },
+    });
+
+    users.forEach((user) => {
+      sendEmail(
+        user?.login,
+        "Новое расписание",
+        `Для вашей группы ${user.group.name} готово новое рассписание`
+      );
     });
 
     res.status(201).json(schedule);

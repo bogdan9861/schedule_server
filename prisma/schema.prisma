@@ -43,7 +43,7 @@ model Schedule {
   file          String
   fileName      String?
   fileExtension String?
-  date          DateTime
+  date          DateTime @default(now())
 
   group   Group @relation(fields: [groupId], references: [id])
   groupId Int

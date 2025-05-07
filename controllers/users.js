@@ -25,7 +25,7 @@ const register = async (req, res) => {
 
     const group = await prisma.group.findFirst({
       where: {
-        id: groupId,
+        id: +groupId,
       },
     });
 
