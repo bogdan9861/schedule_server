@@ -120,6 +120,10 @@ const remove = async (req, res) => {
   try {
     const { id } = req.params;
 
+    if (!id) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const schedule = await prisma.schedule.delete({
       where: {
         id: +id,
