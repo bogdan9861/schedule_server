@@ -32,12 +32,7 @@ const create = async (req, res) => {
         fileExtension: file.mimetype,
       },
       include: {
-        group: {
-          include: {
-            Schedule: false,
-            User: false,
-          },
-        },
+        group: true,
       },
     });
 
@@ -87,7 +82,9 @@ const getMyChedule = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const { groupId } = req.query;
+    const { groupId, name } = req.query;
+
+    console.log(name);
 
     let where = {};
 
@@ -95,11 +92,25 @@ const getAll = async (req, res) => {
       where.groupId = +groupId;
     }
 
+    if (name) {
+      where.fileName = { contains: name };
+    }
+
+    console.log(where);
+
     const schedules = await prisma.schedule.findMany({
       orderBy: {
         date: "desc",
       },
       where,
+      include: {
+        group: {
+          include: {
+            Schedule: false,
+            User: false,
+          },
+        },
+      },
     });
 
     res.status(200).json(schedules);
@@ -110,8 +121,25 @@ const getAll = async (req, res) => {
   }
 };
 
+const remove = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const schedule = await prisma.schedule.delete({
+      where: {
+        id: +id,
+      },
+    });
+
+    res.status(204).json({ status: "success" });
+  } catch (error) {
+    res.status(500).json({ message: "Unknown server error" });
+  }
+};
+
 module.exports = {
   create,
   getMyChedule,
   getAll,
+  remove,
 };
